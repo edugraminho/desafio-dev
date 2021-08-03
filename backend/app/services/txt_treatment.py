@@ -2,28 +2,13 @@ import os
 import datetime
 
 from environs import Env
-from config import DATA_PATH
+from config import DATA_PATH, EXTENSIONS
 
 env = Env()
 env.read_env()
 
-fieldnames = ['id', 'trans_type', 'date', 'value','cpf','card','hour','store_owner','store_name']
-
-
 
 class Cnab:
-
-    # def __init__(self, trans_type, date, value,cpf,card,hour,store_owner,store_name):
-    #     self.trans_type = trans_type
-    #     self.date = date
-    #     self.value = value
-    #     self.cpf = cpf
-    #     self.card = card
-    #     self.hour = hour
-    #     self.store_owner = store_owner
-    #     self.store_name = store_name
-
-
     @staticmethod
     def treatment_txt(filename):
         """Funcao resposavel por tratar o arquivo .txt
@@ -61,3 +46,9 @@ def read_files_data():
         read_txt = treatment.treatment_txt(os.path.join(DATA_PATH, file))
 
     return read_txt
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in EXTENSIONS
+           

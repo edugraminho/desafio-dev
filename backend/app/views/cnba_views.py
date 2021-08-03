@@ -1,56 +1,54 @@
-from flask import Blueprint, request, flash, redirect, url_for, send_from_directory
+from flask import Blueprint, request, flash, redirect, session, send_from_directory
 from werkzeug.utils import secure_filename
+from flask_cors import cross_origin
 import os
-from http import HTTPStatus
-# from sqlalchemy.exc import IntegrityError
+
 from app.services.insert_into_db import insert_list_transfers
 from app.services.http import build_api_response
-from config import DATA_PATH, EXTENSIONS
+from app.services.txt_treatment import allowed_file
+from app.models.cnba_models import Transfers, TransfersSchema, db
+from http import HTTPStatus
+
+from config import DATA_PATH
 
 
 bp = Blueprint('api', __name__)
 
+transfers_schema = TransfersSchema(many=True)
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in EXTENSIONS
-           
+from app.services.http import build_api_response
+from http import HTTPStatus
+from sqlalchemy.exc import IntegrityError
 
-@bp.route('/', methods=['GET', 'POST'])
+
+
+@bp.route('/upload', methods=['POST'])
+@cross_origin()
 def upload_file():
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            flash('Sem arquivo')
-            return redirect(request.url)
-        file = request.files['file']
+    if 'file' not in request.files:
+        flash('Sem arquivo')
+        return redirect(request.url)
+    file = request.files['file']
 
-        if file.filename == '':
-            flash('Sem arquivo selecionado')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+    if file.filename == '':
+        flash('Sem arquivo selecionado')
+        return redirect(request.url)
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(DATA_PATH, filename))
 
-            file.save(os.path.join(DATA_PATH, filename))
+        insert_list_transfers()
 
-            insert_list_transfers()
+    try:
+        db.session.commit()
+        return build_api_response(HTTPStatus.CREATED)
+    except IntegrityError:
+        return build_api_response(HTTPStatus.BAD_REQUEST)
 
-
-            return build_api_response(HTTPStatus.OK)
         
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <input type=file name=file>
-      <input type=submit value=Upload>
-    </form>
-    '''
+@bp.route('/list_all', methods=['GET'])
+@cross_origin()
+def list_all():
+    transfers = Transfers.query.all()
 
-@bp.route('/uploads/<name>')
-def download_file(name):
-    return send_from_directory(DATA_PATH, name)
-
-
-# if __name__ == '__main__':
-#     app.run()
+    return {'data' : transfers_schema.dump(transfers)}, HTTPStatus.OK
