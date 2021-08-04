@@ -17,7 +17,7 @@ def insert_list_transfers():
 
     for transfer in transfers_list:
         record = Transfers(
-            trans_type= int(transfer['trans_type']), 
+            trans_type= transfer['trans_type'],
             date = transfer['date'], 
             value = int(transfer['value']), 
             cpf = int(transfer['cpf']), 

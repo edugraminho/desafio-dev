@@ -16,15 +16,31 @@ class Cnab:
         Args:
             filename (path file): arquivo recebido
         """
+        types_transactions = {
+            1: ["Débito", "Entrada"],
+            2: ["Boleto", "Saída"],
+            3: ["Financiamento", "Saída"],
+            4: ["Crédito", "Entrada"],
+            5: ["Recebimento Empréstimo", "Entrada"],
+            6: ["Vendas", "Entrada"],
+            7: ["Recebimento TED", "Entrada"],
+            8: ["Recebimento DOC", "Entrada"],
+            9: ["Aluguel", "Saída"], }
+
         with open(filename, 'r') as file:
             transfers_list = []
             for line in file.readlines():
+
+                trans_type = ""
+                for k, v in types_transactions.items():
+                    if int(line[0]) == k:
+                        trans_type = v[0]
                 
                 date = datetime.datetime(int(line[1:5]), int(line[5:7]), int(line[7:9]))\
                     .strftime("%d/%m/%Y")
 
                 transfers = {
-                    "trans_type" : int(line[0]),
+                    "trans_type" : trans_type,
                     "date" : str(date),
                     "value" : int(line[9:19]) * 100,
                     "cpf" : int(line[19:30]),

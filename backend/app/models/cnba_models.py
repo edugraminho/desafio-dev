@@ -11,7 +11,7 @@ ma = Marshmallow()
 class Transfers(db.Model):
     __tablename__ = 'transfers'
     id = db.Column(db.Integer, primary_key=True)
-    trans_type= db.Column(db.Integer, nullable=False)
+    trans_type= db.Column(db.String, nullable=False)
     date= db.Column(db.String, nullable=False)
     value= db.Column(db.BigInteger , nullable=False)
     cpf= db.Column(db.BigInteger, nullable=False)
