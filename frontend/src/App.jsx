@@ -9,7 +9,7 @@ import TransferList from "./components/TransferList";
 
 class App extends React.Component {
   state = {
-    uploadedFiles: [],
+    uploadedFiles: []
   }
   
   handleUpload = files => {
@@ -33,29 +33,15 @@ class App extends React.Component {
 
     api.post('upload', data ).then(res => console.log(res))
   }
-  
-
-  getTransfers = () => {
-    // const data = new FormData();
-    // data.append('file', uploadedFile.file, uploadedFile.name)
-
-    api.get('list_all').then(res => console.log(res.data))
-
-  }
-
 
   render(){
     return (
-      
         <Container>
           <GlobalStyles/>
           <Content>
             <Upload onUpload={this.handleUpload}/>
-            {/* <TransferList/>
-            <button onClick={this.getTransfers}> Teste </button> */}
+            <TransferList/>
           </Content>
-
-  
         </Container>
     );
 

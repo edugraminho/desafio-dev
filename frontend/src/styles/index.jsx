@@ -9,7 +9,7 @@ export const Container = styled.div`
 
 export const Content = styled.div`
     width: 100%;
-    max-width: 400px;
+    max-width: 800px;
     margin: 30px;
     background: #eee;
     border-radius: 4px;
